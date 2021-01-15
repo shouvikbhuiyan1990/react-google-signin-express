@@ -1,9 +1,17 @@
 import GoogleLogin from 'react-google-login';
+import axios from 'axios';
 import './App.css';
 
 function App() {
-	const responseGoogle = (response) => {
-		debugger
+	const getAllUsers = async () => {
+		const data = await axios.get('/user/authenticated/getAll');
+		console.log(data);
+	}
+	const responseGoogle = async (response) => {
+		const bodyObject = {
+			authId: response.tokenId
+		};
+		await axios.post('/login/user', bodyObject);
 	}
 	return (
 		<div className="App">
@@ -26,6 +34,7 @@ function App() {
 					onFailure={responseGoogle}
 					cookiePolicy={'single_host_origin'}
 				/>
+				<button onClick={getAllUsers}>Get All Users in db</button>
 			</body>
 		</div>
 	);

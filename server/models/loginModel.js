@@ -10,9 +10,8 @@ const schema = mongoose.Schema({
         type: String,
         required: true
     },
-    loginToken: {
-        type: String,
-        required: true
+    picture: {
+        type: String
     }
 });
 

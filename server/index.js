@@ -1,5 +1,7 @@
 const express = require('express');
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
@@ -25,23 +27,37 @@ app.get('/', function (req, res) {
 });
 
 app.post('/login/user', async (req, res) => {
-
-    const {
-        email,
-        name,
-    } = req.body;
-
-    const loginToken = jwt.sign(`${email}`, secretkey.key);
-
+    const client = new OAuth2Client(process.env.CLIENT_ID);
+    const { authId } = req.body;
 
     try {
-        const loginData = new Login({
-            email,
-            name,
-            loginToken
+        //check if passed token is valid
+        const ticket = await client.verifyIdToken({
+            idToken: authId,
+            audience: process.env.CLIENT_ID
         });
-        await loginData.save();
-        res.status(200).send({
+
+        //get metadata from the id token, to be saved in the db
+        const { name, email, picture } = ticket.getPayload();
+
+        //this value will be passed thru cookie
+        const loginToken = jwt.sign(`${email}`, secretkey.key);
+
+        //upsert is true, this option enables mongoose to create a new entry if there is no existing record matching the filter
+        await Login.findOneAndUpdate({
+            email
+        }, {
+            name,
+            picture
+        }, {
+            upsert: true
+        });
+
+        //creating a cookie name "login", which will expire after 360000 milliseconds from the time of creation
+        //the value of the cookie is a jwt, created using the email id of the google user
+        //later on each call we will deconde this message using secret key and check if user is authenticated
+
+        res.status(200).cookie('login', loginToken, { expire: 360000 + Date.now() }).send({
             success: true
         });
     }
@@ -54,6 +70,7 @@ app.post('/login/user', async (req, res) => {
 
 
 app.get('/user/authenticated/getAll', authenticateUser, async (req, res) => {
+    //authenticateUser is the middleware where we check if the use is valid/loggedin
     try {
         const data = await Login.find({});
         res.status(200).send({
