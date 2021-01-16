@@ -84,4 +84,34 @@ app.get('/user/authenticated/getAll', authenticateUser, async (req, res) => {
     }
 });
 
+
+app.get('/logout/user', async (req, res) => {
+    //logout function
+    try {
+        res.clearCookie('login').send({
+            'success': true
+        });
+    }
+    catch (e) {
+        res.status(500).send({
+            error: e
+        });
+    }
+});
+
+
+app.get('/user/checkLoginStatus', authenticateUser, async (req, res) => {
+    //check if user is logged in already
+    try {
+        res.status(200).send({
+            'success': true
+        });
+    }
+    catch (e) {
+        res.status(500).send({
+            error: e
+        });
+    }
+});
+
 app.listen(9191);
