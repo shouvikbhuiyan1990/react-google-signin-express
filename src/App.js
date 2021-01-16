@@ -63,7 +63,7 @@ function App() {
 			</header>
 			<body>
 				<GoogleLogin
-					clientId="752664132019-6vnl4no33uaarqe6jdqfhubttd0ac5h6.apps.googleusercontent.com"
+					clientId="<--google-client-id-->"
 					render={renderProps => (
 						<button className='btn g-sigin'
 							onClick={renderProps.onClick}
