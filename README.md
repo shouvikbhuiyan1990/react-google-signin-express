@@ -2,6 +2,8 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Create a Google Cloud Project
+Add generated client id in place of <--google-client-id--> in local
 ## Available Scripts
 
 In the project directory, you can run:
